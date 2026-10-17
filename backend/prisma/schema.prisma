@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  WORKER
+}
+
+enum RoomType {
+  ONSITE
+  ONLINE
+}
+
+// Data worker (diisi lewat seeder), dicocokkan dengan akun Clerk lewat email
+model Worker {
+  id          Int       @id @default(autoincrement())
+  workerCode  String    @unique @map("worker_code") @db.VarChar(30) // "ID Work", contoh INM-874867853
+  name        String    @db.VarChar(100)
+  email       String    @unique @db.VarChar(150)
+  phone       String    @db.VarChar(20)
+  position    String    @db.VarChar(100)
+  photoUrl    String?   @map("photo_url")
+  role        Role      @default(WORKER)
+  clerkUserId String?   @unique @map("clerk_user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  bookings    Booking[]
+
+  @@map("workers")
+}
+
+model Room {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  type       RoomType  @default(ONSITE)
+  capacity   Int
+  building   String?   @db.VarChar(50) // untuk filter Gedung
+  floor      Int? // untuk filter Lantai
+  location   String?   @db.VarChar(100) // teks tampilan, contoh "Lantai 2 Gedung A"
+  facilities String[] // contoh ["Proyektor", "Whiteboard", "AC"]
+  image      String?   @db.VarChar(255)
+  notes      String?   @db.VarChar(200)
+  openTime   String    @default("08:00") @map("open_time") @db.VarChar(5)
+  closeTime  String    @default("21:00") @map("close_time") @db.VarChar(5)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  slots      Slot[]
+  bookings   Booking[]
+
+  @@map("rooms")
+}
+
+// Slot 60 menit, jam tepat (08:00-09:00 sampai 20:00-21:00)
+model Slot {
+  id           Int           @id @default(autoincrement())
+  roomId       Int           @map("room_id")
+  startTime    String        @map("start_time") @db.VarChar(5)
+  endTime      String        @map("end_time") @db.VarChar(5)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  room         Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  bookings     Booking[] // booking yang dimulai di slot ini
+  bookingSlots BookingSlot[]
+
+  @@unique([roomId, startTime])
+  @@index([roomId])
+  @@map("slots")
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  code            String        @unique @db.VarChar(20) // contoh BK-7F3A9C
+  roomId          Int           @map("room_id")
+  slotId          Int           @map("slot_id") // slot mulai
+  workerId        Int           @map("worker_id")
+  date            DateTime      @db.Date
+  startTime       String        @map("start_time") @db.VarChar(5)
+  endTime         String        @map("end_time") @db.VarChar(5)
+  durationMinutes Int           @map("duration_minutes") // kelipatan 60
+  participants    Int
+  description     String?       @db.VarChar(200)
+  status          String        @default("confirmed") @db.VarChar(20)
+  // snapshot data worker saat booking dibuat (diisi server, bukan dari body)
+  name            String        @db.VarChar(100)
+  email           String        @db.VarChar(150)
+  phone           String        @db.VarChar(20)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  room            Room          @relation(fields: [roomId], references: [id])
+  slot            Slot          @relation(fields: [slotId], references: [id])
+  worker          Worker        @relation(fields: [workerId], references: [id])
+  bookingSlots    BookingSlot[]
+
+  @@index([roomId, date])
+  @@index([workerId])
+  @@map("bookings")
+}
+
+// Satu baris per jam yang tertutup booking. UNIQUE (slot_id, date) = pengaman utama double booking.
+model BookingSlot {
+  id        Int      @id @default(autoincrement())
+  bookingId Int      @map("booking_id")
+  slotId    Int      @map("slot_id")
+  date      DateTime @db.Date
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  slot      Slot     @relation(fields: [slotId], references: [id])
+
+  @@unique([slotId, date])
+  @@map("booking_slots")
+}
