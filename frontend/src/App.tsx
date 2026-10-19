@@ -11,6 +11,7 @@ import { HomePage } from "./pages/home-page";
 import { RoomDetailPage } from "./pages/room-detail-page";
 import { PlaceholderPage } from "./pages/placeholder-page";
 import { RoomsPage } from "./pages/rooms-page";
+import { HistoryPage } from "./pages/history-page";
 import "./App.css";
 
 function App() {
@@ -31,7 +32,7 @@ function App() {
               path="history"
               element={
                 <RoleGuard role="WORKER">
-                  <PlaceholderPage title="Riwayat Pemesanan" />
+                  <HistoryPage />
                 </RoleGuard>
               }
             />

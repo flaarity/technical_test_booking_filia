@@ -1,6 +1,7 @@
 import { useAuth } from "@clerk/react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { BookingDialog } from "../components/booking-dialog";
 import { RoomCardSkeleton } from "../components/room-card-skeleton";
 import { ApiError, apiRequest } from "../lib/api";
 import type { Room } from "../lib/room-filters";
@@ -226,13 +227,20 @@ function LoadedRoomDetail({
   const [calendarMonth, setCalendarMonth] = useState(initialMonth);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [selectionError, setSelectionError] = useState("");
-  const [bookingMessage, setBookingMessage] = useState("");
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+  const [bookingSchedule, setBookingSchedule] = useState<{
+    roomId: number | string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  } | null>(null);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const [activeBooking, setActiveBooking] = useState<string | number | null>(null);
   const initialQueryApplied = useRef(false);
   const timelineHeadingRef = useRef<HTMLHeadingElement>(null);
+  const bookingButtonRef = useRef<HTMLButtonElement>(null);
   const timelineRange = useMemo(
     () => getTimelineRange(windowStart, visibleDays),
     [visibleDays, windowStart],
@@ -392,7 +400,6 @@ function LoadedRoomDetail({
     setWindowStart(date);
     setSelection(null);
     setSelectionError("");
-    setBookingMessage("");
     const parsed = parseISODate(date)!;
     setCalendarMonth({
       year: parsed.getUTCFullYear(),
@@ -407,7 +414,6 @@ function LoadedRoomDetail({
     setWindowStart(shifted);
     setSelection(null);
     setSelectionError("");
-    setBookingMessage("");
     const parsed = parseISODate(shifted)!;
     setCalendarMonth({
       year: parsed.getUTCFullYear(),
@@ -418,7 +424,6 @@ function LoadedRoomDetail({
   const clearSelection = () => {
     setSelection(null);
     setSelectionError("");
-    setBookingMessage("");
   };
 
   const handleCellSelect = (date: string, rowIndex: number) => {
@@ -453,7 +458,6 @@ function LoadedRoomDetail({
     );
     if (!validation.valid) {
       setSelectionError(validation.reason);
-      setBookingMessage("");
       return;
     }
     setSelection({
@@ -462,7 +466,6 @@ function LoadedRoomDetail({
       awaitingSecond: range.awaitingSecond,
     });
     setSelectionError("");
-    setBookingMessage("");
   };
 
   const handleStartChange = (startTime: string) => {
@@ -494,29 +497,52 @@ function LoadedRoomDetail({
     return () => document.removeEventListener("keydown", onEscape);
   }, [selection]);
 
-  const onRequestBooking = (request: {
-    roomId: number | string;
-    date: string;
-    startTime: string;
-    endTime: string;
-  }) => {
-    if (!request.roomId || !request.date || !request.startTime || !request.endTime) return;
-    setBookingMessage("Popup pemesanan dikerjakan di tahap berikutnya");
-  };
-
   const handleRequestBooking = () => {
     if (!selection) return;
-    onRequestBooking({
+    setBookingSchedule({
       roomId: room.id,
       date: selectedDate,
       startTime: selection.startTime,
       endTime: selection.endTime,
     });
+    setBookingDialogOpen(true);
   };
 
   const focusTimeline = () => {
     timelineHeadingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     timelineHeadingRef.current?.focus({ preventScroll: true });
+  };
+
+  const handleBookingClose = (refreshTimeline: boolean) => {
+    setBookingDialogOpen(false);
+    setBookingSchedule(null);
+    if (refreshTimeline) {
+      timelineBookings.reload();
+      monthBookings.reload();
+      clearSelection();
+    }
+    window.requestAnimationFrame(() => {
+      if (bookingButtonRef.current?.disabled) {
+        focusTimeline();
+      } else {
+        bookingButtonRef.current?.focus();
+      }
+    });
+  };
+
+  const handleBookingSuccess = () => {
+    timelineBookings.reload();
+    monthBookings.reload();
+    clearSelection();
+  };
+
+  const handleSlotUnavailable = () => {
+    setBookingDialogOpen(false);
+    timelineBookings.reload();
+    monthBookings.reload();
+    clearSelection();
+    setSelectionError("Slot waktu tersebut sudah tidak tersedia. Pilih jadwal lain.");
+    window.requestAnimationFrame(() => bookingButtonRef.current?.focus());
   };
 
   const calendarError = monthBookings.error;
@@ -862,6 +888,7 @@ function LoadedRoomDetail({
                       <button
                         type="button"
                         className="button button-primary request-booking-button"
+                        ref={bookingButtonRef}
                         disabled={!selection || !selectedEndTimes.includes(selection.endTime)}
                         onClick={handleRequestBooking}
                       >
@@ -881,11 +908,6 @@ function LoadedRoomDetail({
                       Pilih satu jam, lalu pilih jam lain untuk memperluas rentang. Tekan
                       Escape untuk menghapus pilihan.
                     </p>
-                    {bookingMessage && (
-                      <p className="booking-stage-message" role="status" aria-live="polite">
-                        {bookingMessage}
-                      </p>
-                    )}
                   </section>
                 )}
               </>
@@ -893,6 +915,22 @@ function LoadedRoomDetail({
           </section>
         </div>
       </div>
+      {bookingDialogOpen && bookingSchedule && worker && (
+        <BookingDialog
+          room={room}
+          worker={worker}
+          schedule={bookingSchedule}
+          onClose={handleBookingClose}
+          onSuccess={handleBookingSuccess}
+          onUnavailable={handleSlotUnavailable}
+          onEditSchedule={() => {
+            if (!bookingSchedule) return;
+            setBookingDialogOpen(false);
+            setBookingSchedule(null);
+            window.requestAnimationFrame(focusTimeline);
+          }}
+        />
+      )}
     </section>
   );
 }
