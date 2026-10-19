@@ -1,0 +1,259 @@
+{
+  "info": {
+    "_postman_id": "97dbcb18-f48c-4457-a7b5-9d5e97d5331c",
+    "name": "Book-in API",
+    "description": "Book-in Express API. Set baseUrl and provide your own Clerk session token in token. No credentials or personal data are included.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "roomId",
+      "value": "1"
+    },
+    {
+      "key": "slotId",
+      "value": "1"
+    },
+    {
+      "key": "date",
+      "value": "2099-01-01"
+    },
+    {
+      "key": "rangeEnd",
+      "value": "2099-01-07"
+    }
+  ],
+  "item": [
+    {
+      "name": "Public",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Worker",
+      "item": [
+        {
+          "name": "Get my worker profile",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/workers/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["workers", "me"]
+            }
+          }
+        },
+        {
+          "name": "List rooms",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms"]
+            }
+          }
+        },
+        {
+          "name": "Check room availability",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rooms?date={{date}}&startTime=09:00&endTime=11:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms"],
+              "query": [
+                { "key": "date", "value": "{{date}}" },
+                { "key": "startTime", "value": "09:00" },
+                { "key": "endTime", "value": "11:00" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get room detail",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get room slots",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/slots?roomId={{roomId}}&date={{date}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["slots"],
+              "query": [
+                { "key": "roomId", "value": "{{roomId}}" },
+                { "key": "date", "value": "{{date}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get room calendar bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings?roomId={{roomId}}&from={{date}}&to={{rangeEnd}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"],
+              "query": [
+                { "key": "roomId", "value": "{{roomId}}" },
+                { "key": "from", "value": "{{date}}" },
+                { "key": "to", "value": "{{rangeEnd}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get my booking history",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/bookings/me?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "me"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"slotId\": {{slotId}},\n  \"date\": \"{{date}}\",\n  \"durationMinutes\": 60,\n  \"participants\": 2,\n  \"description\": \"Contoh rapat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Create room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ruang Dokumentasi\",\n  \"type\": \"ONSITE\",\n  \"building\": \"Gedung A\",\n  \"floor\": 1,\n  \"capacity\": 6,\n  \"openTime\": \"08:00\",\n  \"closeTime\": \"21:00\",\n  \"facilities\": [\"Wi-Fi\", \"Whiteboard\"],\n  \"image\": null,\n  \"notes\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms"]
+            }
+          }
+        },
+        {
+          "name": "Update room",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ruang Dokumentasi\",\n  \"type\": \"ONSITE\",\n  \"building\": \"Gedung A\",\n  \"floor\": 1,\n  \"capacity\": 8,\n  \"openTime\": \"08:00\",\n  \"closeTime\": \"21:00\",\n  \"facilities\": [\"Wi-Fi\", \"Whiteboard\"],\n  \"image\": null,\n  \"notes\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete room",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/rooms/{{roomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rooms", "{{roomId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

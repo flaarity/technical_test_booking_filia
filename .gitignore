@@ -1,4 +1,31 @@
-node_modules
+# Environment files
 .env
-.env.local
-dist
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies and generated build output
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/build/
+**/generated/
+
+# Generated Prisma skills
+**/.agents/
+**/.claude/
+**/.windsurf/
+**/.cursor/
+**/.devin/
+**/skills-lock.json
+
+# Logs and editor files
+**/*.log
+.DS_Store
+**/.DS_Store
+.vscode/
+**/.vscode/
+.idea/
+**/.idea/

@@ -1,75 +1,43 @@
-# React + TypeScript + Vite
+# Book-in Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend Book-in memakai React, Vite, dan TypeScript. Aplikasi mengambil data dari backend Express dan menggunakan Clerk untuk login; tidak ada mode `json-server`.
 
-Currently, two official plugins are available:
+## Menjalankan lokal
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Dari folder `frontend`:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+npm ci
+Copy-Item .env.example .env
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Isi `VITE_CLERK_PUBLISHABLE_KEY` di `.env` dari Clerk Dashboard → **API Keys**. Atur `VITE_API_BASE_URL` ke alamat backend (default lokal: `http://localhost:4000`). Vite membuka aplikasi di `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Script
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Perintah | Fungsi |
+|---|---|
+| `npm run dev` | Menjalankan Vite dalam mode pengembangan |
+| `npm run build` | Type-check TypeScript dan membuat build produksi |
+| `npm run lint` | Menjalankan ESLint |
+| `npm test` | Menjalankan unit test Vitest |
+| `npm run preview` | Menyajikan build produksi untuk preview |
 
-```
+## Struktur utama
+
+- `src/lib/api.ts` — lapisan request API.
+- `src/components/` — layout, route guard, kartu, kalender/timeline, dan dialog.
+- `src/context/` — konteks profil worker.
+- `src/hooks/` — pemuatan booking kalender.
+- `src/lib/` — API client, filter, validasi, pemformatan, dan fungsi murni yang dites.
+- `src/pages/` — Beranda, Ruang Rapat, Detail, Riwayat, dan halaman Admin.
+
+## Environment
+
+| Variabel | Fungsi |
+|---|---|
+| `VITE_API_BASE_URL` | Base URL API, default lokal `http://localhost:4000` |
+| `VITE_CLERK_PUBLISHABLE_KEY` | Publishable key dari Clerk Dashboard → **API Keys** |
+
+Lihat [README root](../README.md) untuk setup database, migrasi, seeder, dan autentikasi lengkap.

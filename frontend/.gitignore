@@ -12,6 +12,21 @@ dist
 dist-ssr
 *.local
 
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated output and Prisma skills
+build/
+generated/
+.agents/
+.claude/
+.windsurf/
+.cursor/
+.devin/
+skills-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

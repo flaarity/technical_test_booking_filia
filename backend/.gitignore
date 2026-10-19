@@ -1,5 +1,20 @@
-node_modules
-# Keep environment variables out of version control
+# Environment files
 .env
+.env.*
+!.env.example
 
-/generated/
+# Dependencies and generated output
+node_modules/
+dist/
+generated/
+
+# Generated Prisma skills
+.agents/
+.claude/
+.windsurf/
+.cursor/
+.devin/
+skills-lock.json
+
+# Logs
+*.log
