@@ -6,15 +6,51 @@ Ruang rapat adalah fasilitas internal kantor tanpa biaya sewa. Karena itu field 
 
 ## Screenshot
 
-Tempatkan screenshot hasil aplikasi Anda sendiri di `docs/screenshots/`. Folder tersebut sengaja hanya berisi `.gitkeep`; tidak ada gambar yang dibuat atau disertakan oleh repository.
+### Alur Booking Worker (Stepper)
 
-![Beranda Book-in dengan profil worker](docs/screenshots/beranda.png)
-![Daftar ruang rapat dengan panel filter](docs/screenshots/ruang-rapat-filter.png)
-![Detail ruangan dengan kalender dan timeline jadwal](docs/screenshots/detail-timeline.png)
-![Dialog data pemesan dan ringkasan booking](docs/screenshots/popup-pemesanan.png)
-![Konfirmasi sukses dengan kode booking](docs/screenshots/sukses.png)
-![Tabel riwayat pemesanan worker](docs/screenshots/riwayat.png)
-![Tabel Kelola Ruangan untuk Admin](docs/screenshots/kelola-ruangan.png)
+Empat langkah: **Ruangan → Tanggal & Jam → Data Pemesan → Konfirmasi**, lalu Sukses.
+
+| 1. Ruangan | 2. Tanggal & Jam |
+|---|---|
+| ![Bento card Ruang Rapat](docs/screenshots/worker/4_bento_card_ruang_rapat.png) | ![Timeline pilih jam](docs/screenshots/worker/6_timeline_pilih.png) |
+
+| 3. Data Pemesan & 4. Konfirmasi | Sukses |
+|---|---|
+| ![Popup Pesan Ruang Rapat](docs/screenshots/worker/7_popup_pesan_ruang_rapat.png) | ![Halaman sukses dengan kode booking](docs/screenshots/worker/8_halaman_sukses.png) |
+
+### Halaman Worker Lainnya
+
+| Sign-in (Clerk) | Beranda |
+|---|---|
+| ![Sign-in](docs/screenshots/worker/1_halaman_signin.png) | ![Beranda Worker](docs/screenshots/worker/2_beranda_worker.png) |
+
+| Filter Ruang Rapat | Filter aktif (Tersedia / Tidak tersedia) |
+|---|---|
+| ![Filter](docs/screenshots/worker/3_filter_ruang_rapat.png) | ![Filter aktif](docs/screenshots/worker/3_filter_aktif_ruang_rapat.png) |
+
+| Detail ruangan & kalender | Timeline |
+|---|---|
+| ![Detail dan kalender](docs/screenshots/worker/5_detail_ruang_meeting_kalender.png) | ![Timeline pesan](docs/screenshots/worker/6_timeline_pesan_ruang_rapat.png) |
+
+#### Riwayat Pemesanan
+![Riwayat](docs/screenshots/worker/8_riwayat_pemesanan.png)
+
+### Alur Admin
+
+| Beranda Admin | Kelola Ruangan |
+|---|---|
+| ![Beranda Admin](docs/screenshots/admin/1_beranda_admin.png) | ![Tabel Kelola Ruangan](docs/screenshots/admin/2_tabel_kelola_ruang_rapat.png) |
+
+| Tambah Ruangan | Edit Ruangan |
+|---|---|
+| ![Tambah ruangan](docs/screenshots/admin/3_tambah_ruang_rapat.png) | ![Edit ruangan](docs/screenshots/admin/4_edit_detail_ruang_rapat.png) |
+
+### Tampilan Mobile (360 px)
+<img src="docs/screenshots/mobile/1_tampilan_mobile_360px.png" alt="Tampilan mobile 360 px" width="280" />
+
+### Dokumentasi API
+- Ringkasan endpoint: [`docs/api.md`](docs/api.md)
+- Postman collection: [`docs/postman/`](docs/postman/)
 
 ## Teknologi
 
