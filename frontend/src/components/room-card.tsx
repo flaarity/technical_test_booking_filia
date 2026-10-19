@@ -6,6 +6,7 @@ type RoomCardProps = {
   room: Room;
   isAdmin: boolean;
   scheduleSelected: boolean;
+  previewOnly?: boolean;
 };
 
 function roomDetailSearch(searchParams: URLSearchParams) {
@@ -21,7 +22,12 @@ function roomDetailSearch(searchParams: URLSearchParams) {
   return query.toString();
 }
 
-export function RoomCard({ room, isAdmin, scheduleSelected }: RoomCardProps) {
+export function RoomCard({
+  room,
+  isAdmin,
+  scheduleSelected,
+  previewOnly = false,
+}: RoomCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -115,36 +121,38 @@ export function RoomCard({ room, isAdmin, scheduleSelected }: RoomCardProps) {
           )}
         </div>
 
-        <div className="room-card-actions">
-          <Link
-            className="button button-outline room-detail-button"
-            to={detailPath}
-            state={roomLinkState}
-          >
-            Detail Ruangan
-          </Link>
-          {!isAdmin && (
+        {!previewOnly && (
+          <div className="room-card-actions">
             <Link
-              className={`button button-primary room-book-button${bookingDisabled ? " room-book-disabled" : ""}`}
-              to={bookingDisabled ? "#" : detailPath}
+              className="button button-outline room-detail-button"
+              to={detailPath}
               state={roomLinkState}
-              aria-disabled={bookingDisabled}
-              onClick={(event) => {
-                if (bookingDisabled) event.preventDefault();
-              }}
-              aria-describedby={bookingDisabled ? `unavailable-${room.id}` : undefined}
             >
-              Pesan Ruangan
+              Detail Ruangan
             </Link>
-          )}
-          {bookingDisabled && (
-            <span className="sr-only" id={`unavailable-${room.id}`}>
-              {unavailable
-                ? "Tidak dapat dipesan karena tidak tersedia pada jadwal terpilih."
-                : "Ketersediaan jadwal belum dapat diverifikasi."}
-            </span>
-          )}
-        </div>
+            {!isAdmin && (
+              <Link
+                className={`button button-primary room-book-button${bookingDisabled ? " room-book-disabled" : ""}`}
+                to={bookingDisabled ? "#" : detailPath}
+                state={roomLinkState}
+                aria-disabled={bookingDisabled}
+                onClick={(event) => {
+                  if (bookingDisabled) event.preventDefault();
+                }}
+                aria-describedby={bookingDisabled ? `unavailable-${room.id}` : undefined}
+              >
+                Pesan Ruangan
+              </Link>
+            )}
+            {bookingDisabled && (
+              <span className="sr-only" id={`unavailable-${room.id}`}>
+                {unavailable
+                  ? "Tidak dapat dipesan karena tidak tersedia pada jadwal terpilih."
+                  : "Ketersediaan jadwal belum dapat diverifikasi."}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </article>
   );

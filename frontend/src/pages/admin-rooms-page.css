@@ -1,0 +1,541 @@
+.admin-rooms-page,
+.room-form-page {
+  display: grid;
+  min-width: 0;
+  gap: 19px;
+}
+
+.admin-rooms-breadcrumb,
+.room-form-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b8495;
+  font-size: 11px;
+}
+
+.admin-rooms-breadcrumb a,
+.room-form-breadcrumb button {
+  padding: 0;
+  border: 0;
+  color: #766998;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+}
+
+.admin-rooms-breadcrumb a:hover,
+.room-form-breadcrumb button:hover {
+  color: #4d328a;
+  text-decoration: underline;
+}
+
+.admin-rooms-breadcrumb > span[aria-hidden="true"],
+.room-form-breadcrumb > span[aria-hidden="true"] {
+  color: #b5afc1;
+  font-size: 17px;
+}
+
+.admin-rooms-breadcrumb [aria-current="page"],
+.room-form-breadcrumb [aria-current="page"] {
+  color: #534866;
+  font-weight: 650;
+}
+
+.admin-rooms-heading,
+.room-form-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.admin-rooms-eyebrow {
+  margin: 0 0 6px;
+  color: #8b7da8;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 1.3px;
+}
+
+.admin-rooms-heading h1,
+.room-form-heading h1 {
+  margin: 0;
+  color: #302a3d;
+  font-size: 27px;
+  font-weight: 720;
+  letter-spacing: -0.6px;
+}
+
+.admin-rooms-heading > div > p:last-child,
+.room-form-heading > div > p:last-child {
+  margin: 7px 0 0;
+  color: #817a8b;
+  font-size: 11px;
+}
+
+.admin-add-room {
+  min-height: 43px;
+  flex: 0 0 auto;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.admin-add-room > span {
+  font-size: 17px;
+}
+
+.admin-room-list-panel {
+  display: grid;
+  min-width: 0;
+  gap: 14px;
+  padding: 17px;
+  border: 1px solid #ebe8f0;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(42, 29, 67, 0.035);
+}
+
+.admin-room-list-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-room-search {
+  display: grid;
+  width: min(100%, 370px);
+  gap: 7px;
+  color: #625c6e;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.admin-room-search input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e5e1eb;
+  border-radius: 8px;
+  color: #40394d;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  box-sizing: border-box;
+}
+
+.admin-room-search input:focus-visible {
+  outline: 3px solid rgba(121, 88, 176, 0.17);
+  border-color: #8a6bc2;
+}
+
+.admin-room-total {
+  margin: 0 1px 4px 0;
+  color: #7e778a;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.admin-room-total strong {
+  color: #503782;
+  font-size: 13px;
+}
+
+.admin-room-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #ece9f1;
+  border-radius: 9px;
+  scrollbar-color: #c9bddb #f5f3f8;
+  scrollbar-width: thin;
+}
+
+.admin-room-table {
+  width: 100%;
+  min-width: 910px;
+  border-collapse: collapse;
+  color: #4d4658;
+  font-size: 10px;
+  text-align: left;
+}
+
+.admin-room-table thead {
+  color: #6c657a;
+  background: #f8f6fb;
+}
+
+.admin-room-table th {
+  padding: 13px 11px;
+  border-bottom: 1px solid #eae6ef;
+  font-size: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.admin-room-table td {
+  padding: 12px 11px;
+  border-bottom: 1px solid #f0edf4;
+  vertical-align: middle;
+  line-height: 1.45;
+}
+
+.admin-room-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-room-table tbody tr:hover {
+  background: #fcfbfd;
+}
+
+.admin-room-name {
+  color: #3c3549;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.admin-facility-chips {
+  display: flex;
+  max-width: 215px;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-facility-chips li {
+  padding: 4px 6px;
+  border: 1px solid #ece7f3;
+  border-radius: 5px;
+  color: #64577c;
+  background: #f8f6fb;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.admin-table-muted {
+  color: #8e8797;
+  font-size: 9px;
+}
+
+.admin-hours-cell {
+  white-space: nowrap;
+}
+
+.admin-room-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.admin-edit-link,
+.admin-delete-link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid #e7e1ef;
+  border-radius: 6px;
+  color: #60468f;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin-edit-link:hover,
+.admin-delete-link:hover {
+  background: #f8f5fc;
+}
+
+.admin-delete-link {
+  border-color: #f0d6d7;
+  color: #a3444a;
+}
+
+.admin-delete-link:hover {
+  background: #fff6f6;
+}
+
+.admin-room-empty {
+  display: grid;
+  min-height: 275px;
+  align-content: center;
+  justify-items: center;
+  gap: 9px;
+  border: 1px dashed #ded8e8;
+  border-radius: 10px;
+  background: #fcfbfd;
+  text-align: center;
+}
+
+.admin-room-empty > span {
+  display: grid;
+  width: 47px;
+  height: 47px;
+  place-items: center;
+  margin-bottom: 3px;
+  border-radius: 14px;
+  color: #674b9e;
+  background: #f0ebf8;
+  font-size: 22px;
+}
+
+.admin-room-empty h2 {
+  margin: 0;
+  color: #3b3448;
+  font-size: 16px;
+}
+
+.admin-room-empty p {
+  margin: 0 0 8px;
+  color: #827b8c;
+  font-size: 10px;
+}
+
+.admin-room-empty .button {
+  min-height: 39px;
+  font-size: 10px;
+}
+
+.admin-room-no-match {
+  min-height: 220px;
+}
+
+.admin-room-toast,
+.admin-room-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border: 1px solid #bfe2cc;
+  border-radius: 9px;
+  color: #276642;
+  background: #eff9f2;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.admin-room-toast > span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #3a8a59;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.admin-room-error {
+  border-color: #f0caca;
+  color: #853b41;
+  background: #fff6f6;
+}
+
+.admin-room-error > span,
+.admin-form-error > span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: #a33f45;
+  background: #fce6e6;
+  font-weight: 750;
+}
+
+.admin-room-error p {
+  flex: 1;
+  margin: 0;
+}
+
+.admin-room-error .button,
+.admin-form-error .button {
+  min-height: 34px;
+  font-size: 9px;
+}
+
+.admin-table-skeleton-line {
+  display: block;
+  width: 60px;
+  height: 13px;
+  border-radius: 6px;
+  background: #efedf3;
+  animation: admin-skeleton-pulse 1.4s ease-in-out infinite alternate;
+}
+
+.admin-dialog-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(29, 21, 42, 0.58);
+  box-sizing: border-box;
+}
+
+.admin-confirm-dialog {
+  width: min(100%, 430px);
+  padding: 25px;
+  border: 1px solid #ece7f1;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(26, 16, 43, 0.25);
+}
+
+.admin-confirm-icon {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  margin-bottom: 15px;
+  border: 1px solid #f1d6d6;
+  border-radius: 13px;
+  color: #a6494e;
+  background: #fff2f2;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.admin-confirm-dialog h2 {
+  margin: 0 0 8px;
+  color: #332d40;
+  font-size: 19px;
+}
+
+.admin-confirm-dialog > p {
+  margin: 0;
+  color: #777081;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.admin-confirm-dialog > p strong {
+  color: #4b405c;
+}
+
+.admin-dialog-error {
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px solid #f0caca;
+  border-radius: 8px;
+  color: #853b41;
+  background: #fff6f6;
+}
+
+.admin-dialog-error p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.admin-dialog-retry {
+  margin-top: 7px;
+  padding: 5px 0;
+  border: 0;
+  color: #7f343a;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  text-decoration: underline;
+}
+
+.admin-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.admin-confirm-actions .button {
+  min-height: 40px;
+  font-size: 10px;
+}
+
+.admin-confirm-actions .button-outline {
+  border: 1px solid #e2dce9;
+  color: #5e4b7d;
+  background: #fff;
+}
+
+.admin-confirm-delete {
+  color: #fff;
+  background: #ad454b;
+}
+
+.admin-confirm-delete:hover:not(:disabled) {
+  background: #92363c;
+}
+
+.admin-confirm-actions .button:disabled,
+.admin-dialog-retry:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@keyframes admin-skeleton-pulse {
+  to { opacity: 0.5; }
+}
+
+@media (max-width: 760px) {
+  .admin-rooms-heading,
+  .room-form-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-rooms-heading h1,
+  .room-form-heading h1 {
+    font-size: 24px;
+  }
+
+  .admin-room-list-panel {
+    padding: 13px;
+  }
+
+  .admin-room-table-wrap {
+    margin-right: -2px;
+  }
+}
+
+@media (max-width: 420px) {
+  .admin-room-list-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-room-search {
+    width: 100%;
+  }
+
+  .admin-room-total {
+    margin: 0;
+  }
+
+  .admin-add-room {
+    width: 100%;
+  }
+
+  .admin-confirm-dialog {
+    padding: 21px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-table-skeleton-line {
+    animation: none;
+  }
+}
