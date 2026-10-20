@@ -262,14 +262,15 @@ Tabel `booking_slots` memiliki constraint unik `(slot_id, date)`. Satu baris dib
 
 ## Perbedaan dari kontrak soal dan alasannya
 
-| Soal | Implementasi | Alasan |
-| ---- | ------------ | ------ |
-| Field harga pada ruangan (jika ada di soal awal) | Tidak ada field, kalkulasi, atau kolom harga. Ruangan memiliki tambahan `type`, `building`, `floor`, `location`, `openTime`, `closeTime`, `notes` | Fasilitas internal tanpa biaya sewa; filter Gedung dan Lantai membutuhkan data tambahan |
-| Body `POST /bookings` berisi `name`, `email`, `phone` | Tidak dikirim dari frontend; server mengambilnya dari tabel `workers` lewat sesi Clerk. Ditambah `durationMinutes` dan `description` (opsional). Bila field lama tetap dikirim, diabaikan dan tetap 201 | Data pemesan sudah ada di database dan tidak boleh dipercaya dari klien |
-| Slot dan booking per slot | Slot 60 menit jam tepat; booking bisa mencakup beberapa jam lewat `durationMinutes` dan tabel `booking_slots` | Pemilihan waktu lewat timeline dengan rentang bebas kelipatan 1 jam |
-| Tidak ada autentikasi | Clerk; role Worker/Admin dibaca dari `workers.role` | Aplikasi internal dengan dua peran |
-| Frontend di atas json-server | Frontend langsung memakai backend Express | Frontend dan backend dikerjakan bersamaan; lihat Keterbatasan |
-| 409 untuk slot terisi, 422 untuk validasi | Sesuai soal; kapasitas melebihi batas dan durasi melewati jam tutup juga 409 | Mengikuti soal |
+| Soal                                                           | Implementasi                                                                                                                                                                                            | Alasan                                                                                                                                                             |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Studi kasus coworking space dengan "pelanggan"                 | Aplikasi internal kantor dengan "worker" dan "admin"                                                                                                                                                    | Mengikuti PRD revisi: ruang rapat adalah fasilitas karyawan tanpa biaya sewa                                                                                       |
+| `GET /rooms` memuat `pricePerHour`                             | Field harga dihapus. Ruangan memiliki tambahan `type`, `building`, `floor`, `location`, `openTime`, `closeTime`, `notes`                                                                                | Fasilitas internal tanpa biaya sewa; filter Gedung dan Lantai membutuhkan data tambahan                                                                            |
+| Body `POST /bookings` berisi `name`, `email`, `phone`          | Tidak dikirim dari frontend; server mengambilnya dari tabel `workers` lewat sesi Clerk. Ditambah `durationMinutes` dan `description` (opsional). Bila field lama tetap dikirim, diabaikan dan tetap 201 | Data pemesan sudah ada di database dan tidak boleh dipercaya dari klien                                                                                            |
+| `GET /slots` memuat `time`; satu booking memakai satu `slotId` | Slot 60 menit jam tepat; booking bisa mencakup beberapa jam lewat `durationMinutes` dan tabel `booking_slots`                                                                                           | Pemilihan waktu lewat timeline dengan rentang bebas kelipatan 1 jam                                                                                                |
+| Tidak ada autentikasi                                          | Clerk; role Worker/Admin dibaca dari `workers.role`                                                                                                                                                     | Aplikasi internal dengan dua peran                                                                                                                                 |
+| Frontend memakai mock API json-server                          | Frontend langsung memakai backend Express                                                                                                                                                               | Autentikasi Clerk, role Admin/Worker, dan pencegahan double booking (409) harus ditegakkan di server; json-server tidak bisa melakukannya. Lihat juga Keterbatasan |
+| 409 untuk slot terisi, 422 untuk validasi                      | Sesuai soal; kapasitas melebihi batas dan durasi melewati jam tutup juga 409                                                                                                                            | Mengikuti soal                                                                                                                                                     |
 
 ## Pengujian
 
@@ -292,15 +293,15 @@ Test backend saat ini menjalankan unit test fungsi waktu booking. Test frontend 
 
 ## Troubleshooting
 
-| Gejala | Penyebab dan solusi |
-| ------ | ------------------- |
-| 401 pada request API (misalnya di Postman) | Token sesi Clerk berumur pendek (kira-kira satu menit) atau tidak dikirim. Ambil token baru dan kirim sebagai `Authorization: Bearer <token>`. |
-| 403 "Akun belum terdaftar sebagai worker" | Email terverifikasi akun Clerk tidak ada di tabel `workers`. Samakan dengan `SEED_WORKER_EMAIL` atau `SEED_ADMIN_EMAIL`, lalu jalankan `npm run db:seed`. |
-| Error CORS di browser | `FRONTEND_ORIGIN` di `backend/.env` harus persis sama dengan origin frontend (contoh `http://localhost:5173`). |
-| Migrasi gagal terhubung ke database | `DATABASE_URL` harus diawali `postgres://` atau `postgresql://`, bukan `prisma+postgres://`. |
-| Peringatan SSL dari `pg` | Hanya peringatan. Tambahkan `sslmode=verify-full` pada URL untuk menghilangkannya. |
-| Perintah Prisma tidak menemukan konfigurasi | Selalu tambahkan `--config prisma7.config.ts`, dan jalankan dari folder `backend`. |
-| Perilaku Prisma berbeda dari yang diharapkan | Proyek memakai Prisma 7.10.x. Pasang dengan `npm ci` dan jangan upgrade ke Prisma 8. |
+| Gejala                                       | Penyebab dan solusi                                                                                                                                       |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 401 pada request API (misalnya di Postman)   | Token sesi Clerk berumur pendek (kira-kira satu menit) atau tidak dikirim. Ambil token baru dan kirim sebagai `Authorization: Bearer <token>`.            |
+| 403 "Akun belum terdaftar sebagai worker"    | Email terverifikasi akun Clerk tidak ada di tabel `workers`. Samakan dengan `SEED_WORKER_EMAIL` atau `SEED_ADMIN_EMAIL`, lalu jalankan `npm run db:seed`. |
+| Error CORS di browser                        | `FRONTEND_ORIGIN` di `backend/.env` harus persis sama dengan origin frontend (contoh `http://localhost:5173`).                                            |
+| Migrasi gagal terhubung ke database          | `DATABASE_URL` harus diawali `postgres://` atau `postgresql://`, bukan `prisma+postgres://`.                                                              |
+| Peringatan SSL dari `pg`                     | Hanya peringatan. Tambahkan `sslmode=verify-full` pada URL untuk menghilangkannya.                                                                        |
+| Perintah Prisma tidak menemukan konfigurasi  | Selalu tambahkan `--config prisma7.config.ts`, dan jalankan dari folder `backend`.                                                                        |
+| Perilaku Prisma berbeda dari yang diharapkan | Proyek memakai Prisma 7.10.x. Pasang dengan `npm ci` dan jangan upgrade ke Prisma 8.                                                                      |
 
 ## Keterbatasan yang diketahui
 
