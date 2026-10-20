@@ -10,45 +10,48 @@ Ruang rapat adalah fasilitas internal kantor tanpa biaya sewa. Karena itu field 
 
 Empat langkah: **Ruangan → Tanggal & Jam → Data Pemesan → Konfirmasi**, lalu Sukses.
 
-| 1. Ruangan | 2. Tanggal & Jam |
-|---|---|
+| 1. Ruangan                                                                      | 2. Tanggal & Jam                                                    |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | ![Bento card Ruang Rapat](docs/screenshots/worker/4_bento_card_ruang_rapat.png) | ![Timeline pilih jam](docs/screenshots/worker/6_timeline_pilih.png) |
 
-| 3. Data Pemesan & 4. Konfirmasi | Sukses |
-|---|---|
+| 3. Data Pemesan & 4. Konfirmasi                                                   | Sukses                                                                              |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | ![Popup Pesan Ruang Rapat](docs/screenshots/worker/7_popup_pesan_ruang_rapat.png) | ![Halaman sukses dengan kode booking](docs/screenshots/worker/8_halaman_sukses.png) |
 
 ### Halaman Worker Lainnya
 
-| Sign-in (Clerk) | Beranda |
-|---|---|
+| Sign-in (Clerk)                                          | Beranda                                                         |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
 | ![Sign-in](docs/screenshots/worker/1_halaman_signin.png) | ![Beranda Worker](docs/screenshots/worker/2_beranda_worker.png) |
 
-| Filter Ruang Rapat | Filter aktif (Tersedia / Tidak tersedia) |
-|---|---|
+| Filter Ruang Rapat                                          | Filter aktif (Tersedia / Tidak tersedia)                                |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------- |
 | ![Filter](docs/screenshots/worker/3_filter_ruang_rapat.png) | ![Filter aktif](docs/screenshots/worker/3_filter_aktif_ruang_rapat.png) |
 
-| Detail ruangan & kalender | Timeline |
-|---|---|
+| Detail ruangan & kalender                                                           | Timeline                                                                    |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | ![Detail dan kalender](docs/screenshots/worker/5_detail_ruang_meeting_kalender.png) | ![Timeline pesan](docs/screenshots/worker/6_timeline_pesan_ruang_rapat.png) |
 
 #### Riwayat Pemesanan
+
 ![Riwayat](docs/screenshots/worker/8_riwayat_pemesanan.png)
 
 ### Alur Admin
 
-| Beranda Admin | Kelola Ruangan |
-|---|---|
+| Beranda Admin                                                | Kelola Ruangan                                                                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | ![Beranda Admin](docs/screenshots/admin/1_beranda_admin.png) | ![Tabel Kelola Ruangan](docs/screenshots/admin/2_tabel_kelola_ruang_rapat.png) |
 
-| Tambah Ruangan | Edit Ruangan |
-|---|---|
+| Tambah Ruangan                                                     | Edit Ruangan                                                          |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------- |
 | ![Tambah ruangan](docs/screenshots/admin/3_tambah_ruang_rapat.png) | ![Edit ruangan](docs/screenshots/admin/4_edit_detail_ruang_rapat.png) |
 
 ### Tampilan Mobile (360 px)
+
 <img src="docs/screenshots/mobile/1_tampilan_mobile_360px.png" alt="Tampilan mobile 360 px" width="280" />
 
 ### Dokumentasi API
+
 - Ringkasan endpoint: [`docs/api.md`](docs/api.md)
 - Postman collection: [`docs/postman/`](docs/postman/)
 
@@ -189,6 +192,63 @@ Semua endpoint aplikasi selain `/health` memerlukan sesi Clerk. Untuk kontrak, v
 | PUT    | `/rooms/:id`                  | Admin  | Ubah ruangan                                          |
 | DELETE | `/rooms/:id`                  | Admin  | Hapus ruangan bila belum punya booking                |
 
+## Desain database
+
+```mermaid
+erDiagram
+  WORKERS ||--o{ BOOKINGS : membuat
+  ROOMS ||--o{ SLOTS : memiliki
+  ROOMS ||--o{ BOOKINGS : dipesan
+  SLOTS ||--o{ BOOKINGS : "slot mulai"
+  BOOKINGS ||--|{ BOOKING_SLOTS : menutup
+  SLOTS ||--o{ BOOKING_SLOTS : terisi
+  WORKERS {
+    int id PK
+    string worker_code UK
+    string name
+    string email UK
+    string phone
+    string position
+    string role
+    string clerk_user_id UK
+  }
+  ROOMS {
+    int id PK
+    string name
+    string type
+    int capacity
+    string building
+    int floor
+    string location
+    string open_time
+    string close_time
+  }
+  SLOTS {
+    int id PK
+    int room_id FK
+    string time
+  }
+  BOOKINGS {
+    int id PK
+    string code UK
+    int room_id FK
+    int slot_id FK
+    int worker_id FK
+    date date
+    int duration_minutes
+    int participants
+    string description
+  }
+  BOOKING_SLOTS {
+    int id PK
+    int booking_id FK
+    int slot_id FK
+    date date
+  }
+```
+
+Tabel `booking_slots` memiliki constraint unik `(slot_id, date)`. Satu baris dibuat untuk setiap jam yang tertutup booking, sehingga database sendiri menolak booking ganda, termasuk saat dua request masuk bersamaan (race condition). Pembuatan booking dan seluruh barisnya berlangsung dalam satu transaksi, dan pelanggaran constraint diubah menjadi respons 409. Nama, email, dan telepon pada `bookings` adalah snapshot dari `workers` saat booking dibuat.
+
 ## Asumsi dan keputusan desain
 
 - Booking adalah fasilitas internal tanpa biaya: harga dan paket konsumsi tidak digunakan.
@@ -199,6 +259,17 @@ Semua endpoint aplikasi selain `/health` memerlukan sesi Clerk. Untuk kontrak, v
 - Tanggal dan status booking memakai zona `Asia/Jakarta`; tanggal API berbentuk `YYYY-MM-DD`.
 - Frontend menggunakan backend Express secara langsung. `json-server`/mode mock tidak dipakai.
 - Pembatalan/perubahan booking, notifikasi, pembayaran, dan dashboard seluruh booking Admin berada di luar scope.
+
+## Perbedaan dari kontrak soal dan alasannya
+
+| Soal | Implementasi | Alasan |
+| ---- | ------------ | ------ |
+| Field harga pada ruangan (jika ada di soal awal) | Tidak ada field, kalkulasi, atau kolom harga. Ruangan memiliki tambahan `type`, `building`, `floor`, `location`, `openTime`, `closeTime`, `notes` | Fasilitas internal tanpa biaya sewa; filter Gedung dan Lantai membutuhkan data tambahan |
+| Body `POST /bookings` berisi `name`, `email`, `phone` | Tidak dikirim dari frontend; server mengambilnya dari tabel `workers` lewat sesi Clerk. Ditambah `durationMinutes` dan `description` (opsional). Bila field lama tetap dikirim, diabaikan dan tetap 201 | Data pemesan sudah ada di database dan tidak boleh dipercaya dari klien |
+| Slot dan booking per slot | Slot 60 menit jam tepat; booking bisa mencakup beberapa jam lewat `durationMinutes` dan tabel `booking_slots` | Pemilihan waktu lewat timeline dengan rentang bebas kelipatan 1 jam |
+| Tidak ada autentikasi | Clerk; role Worker/Admin dibaca dari `workers.role` | Aplikasi internal dengan dua peran |
+| Frontend di atas json-server | Frontend langsung memakai backend Express | Frontend dan backend dikerjakan bersamaan; lihat Keterbatasan |
+| 409 untuk slot terisi, 422 untuk validasi | Sesuai soal; kapasitas melebihi batas dan durasi melewati jam tutup juga 409 | Mengikuti soal |
 
 ## Pengujian
 
@@ -219,21 +290,32 @@ npm test
 
 Test backend saat ini menjalankan unit test fungsi waktu booking. Test frontend adalah unit test Vitest; build memeriksa TypeScript. Pengujian alur end-to-end yang memerlukan sesi Clerk dan database harus dilakukan dengan akun dan database pengembangan.
 
+## Troubleshooting
+
+| Gejala | Penyebab dan solusi |
+| ------ | ------------------- |
+| 401 pada request API (misalnya di Postman) | Token sesi Clerk berumur pendek (kira-kira satu menit) atau tidak dikirim. Ambil token baru dan kirim sebagai `Authorization: Bearer <token>`. |
+| 403 "Akun belum terdaftar sebagai worker" | Email terverifikasi akun Clerk tidak ada di tabel `workers`. Samakan dengan `SEED_WORKER_EMAIL` atau `SEED_ADMIN_EMAIL`, lalu jalankan `npm run db:seed`. |
+| Error CORS di browser | `FRONTEND_ORIGIN` di `backend/.env` harus persis sama dengan origin frontend (contoh `http://localhost:5173`). |
+| Migrasi gagal terhubung ke database | `DATABASE_URL` harus diawali `postgres://` atau `postgresql://`, bukan `prisma+postgres://`. |
+| Peringatan SSL dari `pg` | Hanya peringatan. Tambahkan `sslmode=verify-full` pada URL untuk menghilangkannya. |
+| Perintah Prisma tidak menemukan konfigurasi | Selalu tambahkan `--config prisma7.config.ts`, dan jalankan dari folder `backend`. |
+| Perilaku Prisma berbeda dari yang diharapkan | Proyek memakai Prisma 7.10.x. Pasang dengan `npm ci` dan jangan upgrade ke Prisma 8. |
+
 ## Keterbatasan yang diketahui
 
 - Route terautentikasi memerlukan database yang sudah dimigrasi, key Clerk, serta worker yang cocok dengan email terverifikasi.
 - Repository tidak menyediakan json-server atau data mock; endpoint diuji melalui backend nyata.
 - Suite yang tersedia tidak menggantikan pengujian integrasi race condition, autentikasi Clerk, maupun alur browser penuh pada database baru.
-- Screenshot visual belum disertakan; folder `docs/screenshots/` disediakan untuk gambar hasil uji Anda.
 - Build frontend berhasil, tetapi Vite memperingatkan bahwa chunk JavaScript utama melebihi 500 kB; pemecahan chunk belum dilakukan.
 
-## Penggunaan AI (draf)
+## Penggunaan AI
 
 Claude (chat) digunakan untuk merevisi PRD, merencanakan tahapan, menyusun prompt, dan membantu debugging setup Prisma, Git, serta Clerk. GitHub Copilot di VS Code digunakan untuk menulis kode backend dan frontend tahap demi tahap berdasarkan PRD. Saya menjalankan aplikasi, melakukan pengujian manual melalui Postman dan browser, meninjau perubahan, dan membuat seluruh commit.
 
 **Yang saya kerjakan sendiri**
 
-- Menyiapkan struktrur monorepo, memasang dependensi, dan memindahkan Prisma ke versi 7.10 setelah menemukan Prisma 8 (RC) tidak cocok dengan rencana.
+- Menyiapkan struktur monorepo, memasang dependensi, dan memindahkan Prisma ke versi 7.10 setelah menemukan Prisma 8 (RC) tidak cocok dengan rencana.
 - Membuat aplikasi Clerk, database Prisma Postgres di Vercel, dan mengisi semua file '.env' (tidak pernah dibagikan ke alat AI maupun di-commit).
 - Menjalankan migrasi dan seeder, lalu memeriksa hasilnya di Prisma Studio.
 - Menguji seluruh endpoint API di Postman memakai token sesi Clerk untuk peran Worker dan Admin.
@@ -242,4 +324,4 @@ Claude (chat) digunakan untuk merevisi PRD, merencanakan tahapan, menyusun promp
 
 **Verifikasi**
 
-Setiap tahap dibatasi oleh prompt: alat AI tidak boleh membaca '.env', mengubah skema, atau melakukan commit. Hasilnya diperiksa dengan build, link, dan unit test. Pengujian yang memerlukan login dan database nyata dilakukan manual oleh saya.
+Setiap tahap dibatasi oleh prompt: alat AI tidak boleh membaca '.env', mengubah skema, atau melakukan commit. Hasilnya diperiksa dengan build, lint, dan unit test. Pengujian yang memerlukan login dan database nyata dilakukan manual oleh saya.
